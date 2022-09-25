@@ -1,0 +1,6 @@
+stake - total SCRT staked to AmberDAO
+delegators - total number of delegators
+whale - current largest delegation
+top5whale - top 5 largest delegations
+fact - get a random fact about amber
+price - current price of $AMBER
