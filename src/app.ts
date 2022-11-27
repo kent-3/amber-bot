@@ -1,8 +1,7 @@
 import { SecretNetworkClient } from 'secretjs'
-import { Context, Telegraf, Markup, Telegram } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { Update } from 'typegram';
 import 'dotenv/config'
-import fetch from 'node-fetch'
 import { randomInt } from 'crypto';
 
 const bot: Telegraf<Context<Update>> = new Telegraf(process.env.BOT_TOKEN as string);
@@ -19,10 +18,7 @@ bot.start((ctx) => {
   ctx.reply('Hello ' + ctx.from.first_name + '!');
 });
 bot.help((ctx) => {
-  ctx.reply('Get Facts about AmberDAO:\n/stake - total SCRT staked\n/delegators - total number of delegators\n/whale - the largest delegation\n/top5whale - top 5 largest delegations\n/fact - get a random fact about amber\n/price - current price of $AMBER');
-  // ctx.reply('Send /delegations to receive a message with info about AmberDAO');
-  // ctx.reply('Send /whale to receive a message with info about the largest delegator')
-  // ctx.reply('Send /quit to stop the bot');
+  ctx.reply('Get Facts about AmberDAO:\n/stake - total SCRT staked\n/delegators - total number of delegators\n/whale - the largest delegation\n/top5whale - top 5 largest delegations\n/fact - get a random fact about amber\n/price - current price of $AMBER\n/claimed - amount of $AMBER claimed to-date');
 });
 bot.command('stake', async (ctx) => {
   const { validator: response } = await secretjs.query.staking.validator({validatorAddr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6'})
@@ -90,6 +86,22 @@ bot.command('kent', (ctx) => {
 });
 bot.command('Kent', (ctx) => {
   ctx.reply('Kent is a cool guy who made this bot')
+});
+bot.command('claimed', async (ctx) => {
+  const { balance: { amount: amount} } = await secretjs.query.snip20.getBalance(
+    {
+      contract: {
+        codeHash: "5a085bd8ed89de92b35134ddd12505a602c7759ea25fb5c089ba03c8535b3042",
+        address: "secret1s09x2xvfd2lp2skgzm29w2xtena7s8fq98v852",
+      },
+      address: "secret1hctvs6s48yu7pr2n3ujn3wn74fr5d798daqwwg",
+      auth: {
+        key: "amber_rocks"
+      }
+    }
+  )
+  const claimed = (5110600000 - parseInt(amount)) / 1000000
+  ctx.reply(`${claimed} AMBER have been claimed.`)
 });
 // bot.command('quit', (ctx) => {
 //   // Explicit usage
