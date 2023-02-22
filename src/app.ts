@@ -7,10 +7,11 @@ import { randomInt } from 'crypto';
 const bot: Telegraf<Context<Update>> = new Telegraf(process.env.BOT_TOKEN as string);
 
 const grpcWebUrl: string = process.env.GRPC_WEB_URL!;
+const url: string = process.env.LCD_URL!;
 
-// To create a readonly secret.js client, just pass in a gRPC-web endpoint
-const secretjs = await SecretNetworkClient.create({
-  grpcWebUrl,
+// To create a readonly secret.js client, just pass in a LCD endpoint
+const secretjs = new SecretNetworkClient({
+  url,
   chainId: "secret-4",
 });
 
@@ -21,13 +22,13 @@ bot.help((ctx) => {
   ctx.reply('Get Facts about AmberDAO:\n/stake - total SCRT staked\n/delegators - total number of delegators\n/whale - the largest delegation\n/top5whale - top 5 largest delegations\n/fact - get a random fact about amber\n/price - current price of $AMBER\n/claimed - amount of $AMBER claimed to-date');
 });
 bot.command('stake', async (ctx) => {
-  const { validator: response } = await secretjs.query.staking.validator({validatorAddr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6'})
-  let scrt = Math.round(parseInt(response!.tokens) / 1000000 )
+  const { validator: response } = await secretjs.query.staking.validator({validator_addr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6'})
+  let scrt = Math.round(parseInt(response!.tokens!) / 1000000 )
   ctx.reply(`AmberDAO has ${scrt} SCRT staked.`)
 });
 bot.command('delegators', async (ctx) => {
-  const { delegationResponses: response } = await secretjs.query.staking.validatorDelegations({validatorAddr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
-  let total: number = response.length
+  const { delegation_responses: response } = await secretjs.query.staking.validatorDelegations({validator_addr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
+  let total: number = response!.length
   ctx.reply(`AmberDAO has ${total} delegations.`)
 });
 bot.command('fact', (ctx) => {
@@ -52,20 +53,20 @@ bot.command('price', (ctx) => {
   ctx.reply(`1 $AMBER = 1 $AMBER`)
 });
 bot.command('whale', async (ctx) => {
-  const { delegationResponses: response } = await secretjs.query.staking.validatorDelegations({validatorAddr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
+  const { delegation_responses: response } = await secretjs.query.staking.validatorDelegations({validator_addr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
   let amounts: number[] = []
-  for (let i = 0; i < response.length; i++) {
-    amounts.push(parseInt(response[i].balance?.amount!))
+  for (let i = 0; i < response!.length; i++) {
+    amounts.push(parseInt(response![i].balance?.amount!))
   }
   amounts.sort((a,b) => a-b).reverse()
   let amount = Math.round(amounts[0] / 1000000)
   ctx.reply(`The largest delegation to AmberDAO is ${ amount } SCRT!`)
 });
 bot.command('top5whale', async (ctx) => {
-  const { delegationResponses: response } = await secretjs.query.staking.validatorDelegations({validatorAddr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
+  const { delegation_responses: response } = await secretjs.query.staking.validatorDelegations({validator_addr: 'secretvaloper18w7rm926ue3nmy8ay58e3lc2nqnttrlhhgpch6', pagination: {limit:'1000000'}})
   let amounts: number[] = []
-  for (let i = 0; i < response.length; i++) {
-    amounts.push(parseInt(response[i].balance?.amount!))
+  for (let i = 0; i < response!.length; i++) {
+    amounts.push(parseInt(response![i].balance?.amount!))
   }
   amounts.sort((a,b) => a-b).reverse()
   let top_five: number[] = []
@@ -91,7 +92,7 @@ bot.command('claimed', async (ctx) => {
   const { balance: { amount: amount} } = await secretjs.query.snip20.getBalance(
     {
       contract: {
-        codeHash: "5a085bd8ed89de92b35134ddd12505a602c7759ea25fb5c089ba03c8535b3042",
+        code_hash: "5a085bd8ed89de92b35134ddd12505a602c7759ea25fb5c089ba03c8535b3042",
         address: "secret1s09x2xvfd2lp2skgzm29w2xtena7s8fq98v852",
       },
       address: "secret1hctvs6s48yu7pr2n3ujn3wn74fr5d798daqwwg",
