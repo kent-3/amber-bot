@@ -13,7 +13,7 @@
   "dependencies": {
     "dotenv": "^16.0.1",
     "node-fetch": "^3.2.6",
-    "secretjs": "^1.6.0",
+    "secretjs": "^1.7.1",
     "telegraf": "^4.9.2"
   },
   "devDependencies": {

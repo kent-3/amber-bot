@@ -5,7 +5,7 @@ import { randomInt } from 'crypto';
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const grpcWebUrl = process.env.GRPC_WEB_URL;
 const url = process.env.LCD_URL;
-// To create a readonly secret.js client, just pass in a gRPC-web endpoint
+// To create a readonly secret.js client, just pass in a LCD endpoint
 const secretjs = new SecretNetworkClient({
     url,
     chainId: "secret-4",
